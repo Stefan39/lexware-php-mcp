@@ -1,2 +1,16 @@
-# The maintainer owns every file. The branch ruleset on main requires a pull request with green CI.
-* @Stefan39
+# The maintainer reviews changes to CI, agent rules, tool configuration, dependencies and the release build.
+# Other paths may be changed by the agent pipeline; the branch ruleset on main still requires a pull request
+# with the maintainer's approval and green CI for every change.
+/.github/                  @Stefan39
+/CLAUDE.md                 @Stefan39
+/AGENTS.md                 @Stefan39
+/composer.json             @Stefan39
+/composer.lock             @Stefan39
+/phpstan.dist.neon         @Stefan39
+/phpunit.dist.xml          @Stefan39
+/.php-cs-fixer.dist.php    @Stefan39
+/.jscpd.json               @Stefan39
+/Makefile                  @Stefan39
+/box.json                  @Stefan39
+/build-tools/              @Stefan39
+/renovate.json             @Stefan39
