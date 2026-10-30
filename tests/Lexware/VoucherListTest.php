@@ -47,11 +47,12 @@ final class VoucherListTest extends TestCase
 
     public function testAppliesSensitiveDataFilterToEveryPage(): void
     {
-        [$vouchers] = $this->createList([$this->fixture(0), $this->fixture(1)])->fetch([], 10);
+        [$vouchers] = $this->createList([
+            $this->page([['id' => 'v1', 'iban' => 'DE02120300000000202051', 'bic' => 'BYLADEM1001']], false),
+            $this->page([['id' => 'v2', 'IBAN' => 'DE89370400440532013000', 'bankAccount' => ['accountHolder' => 'Max Muster']]], true),
+        ])->fetch([], 10);
 
-        $json = (string) json_encode($vouchers);
-        self::assertStringNotContainsStringIgnoringCase('iban', $json);
-        self::assertStringNotContainsString('DE02120300000000202051', $json);
+        self::assertSame([['id' => 'v1'], ['id' => 'v2']], $vouchers);
     }
 
     public function testIgnoresMissingContentAndTreatsMissingLastAsFinal(): void
@@ -72,6 +73,14 @@ final class VoucherListTest extends TestCase
         $client = new LexwareClient(new MockHttpClient($responses, 'https://api.example.test'), new RequestThrottle($clock), $clock);
 
         return new VoucherList($client, new SensitiveDataFilter());
+    }
+
+    /**
+     * @param list<array<string, mixed>> $content
+     */
+    private function page(array $content, bool $last): MockResponse
+    {
+        return new MockResponse((string) json_encode(['content' => $content, 'last' => $last]));
     }
 
     private function fixture(int $page): MockResponse
