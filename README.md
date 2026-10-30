@@ -43,13 +43,14 @@ runtime to give an AI assistant access to their bookkeeping.
 
 ## Status
 
-v0.3.0, early but usable. See the [changelog](CHANGELOG.md). Currently available tool:
+v0.3.0, early but usable. See the [changelog](CHANGELOG.md). Currently available tools:
 
 | Tool | What it does |
 |---|---|
 | `open_items` | Unpaid sales invoices (open and overdue), oldest due date first, with days overdue and totals per currency. Optional filters: `overdueOnly`, `contact`. Amounts are gross. |
+| `search_vouchers` | Search vouchers by type, status, date range, contact and number, newest first. Optional parameters: `voucherType`, `voucherStatus`, `dateFrom`, `dateTo`, `voucherNumber`, `contact`, `limit` (default 50, max 250). Amounts are gross. |
 
-Planned: voucher search, voucher detail with net amounts, contact search, revenue per period.
+Planned: voucher detail with net amounts, contact search, revenue per period.
 See [ADR 0001](docs/adr/0001-architecture.md).
 
 ## Safety

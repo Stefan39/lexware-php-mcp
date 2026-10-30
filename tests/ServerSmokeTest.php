@@ -11,7 +11,7 @@ final class ServerSmokeTest extends TestCase
 {
     private const string BINARY = __DIR__ . '/../bin/lexware-php-mcp';
 
-    public function testStdioServerAnnouncesReadOnlyOpenItemsTool(): void
+    public function testStdioServerAnnouncesReadOnlyTools(): void
     {
         $responses = $this->exchange(['LEXWARE_API_KEY' => 'dummy-key-for-smoke-test'], [
             ['jsonrpc' => '2.0', 'id' => 1, 'method' => 'initialize', 'params' => [
@@ -27,8 +27,11 @@ final class ServerSmokeTest extends TestCase
         self::assertSame(ServerFactory::VERSION, $responses[1]['result']['serverInfo']['version'] ?? null);
 
         $tools = array_column($responses[2]['result']['tools'] ?? [], null, 'name');
-        self::assertSame(['open_items'], array_keys($tools));
-        self::assertTrue($tools['open_items']['annotations']['readOnlyHint'] ?? false);
+        self::assertSame(['open_items', 'search_vouchers'], array_keys($tools));
+        foreach ($tools as $tool) {
+            self::assertTrue($tool['annotations']['readOnlyHint'] ?? false);
+            self::assertFalse($tool['annotations']['destructiveHint'] ?? true);
+        }
         self::assertStringNotContainsString('dummy-key-for-smoke-test', (string) json_encode($responses));
     }
 

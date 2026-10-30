@@ -44,13 +44,14 @@ Laufzeitumgebung brauchen sollen, um einem KI-Assistenten Zugriff auf ihre Buchh
 
 ## Status
 
-v0.3.0, früh, aber nutzbar. Siehe das [Changelog](CHANGELOG.md) (englisch). Aktuell verfügbares Werkzeug:
+v0.3.0, früh, aber nutzbar. Siehe das [Changelog](CHANGELOG.md) (englisch). Aktuell verfügbare Werkzeuge:
 
 | Werkzeug | Was es tut |
 |---|---|
 | `open_items` | Unbezahlte Ausgangsrechnungen (offen und überfällig), älteste Fälligkeit zuerst, mit Tagen überfällig und Summen je Währung. Optionale Filter: `overdueOnly`, `contact`. Beträge sind brutto. |
+| `search_vouchers` | Belege nach Typ, Status, Zeitraum, Kontakt und Nummer suchen, neueste zuerst. Optionale Parameter: `voucherType`, `voucherStatus`, `dateFrom`, `dateTo`, `voucherNumber`, `contact`, `limit` (Standard 50, max. 250). Beträge sind brutto. |
 
-Geplant: Belegsuche, Beleg-Detail mit Nettobeträgen, Kontaktsuche, Umsatz je Zeitraum.
+Geplant: Beleg-Detail mit Nettobeträgen, Kontaktsuche, Umsatz je Zeitraum.
 Siehe [ADR 0001](docs/adr/0001-architecture.md).
 
 ## Sicherheit
