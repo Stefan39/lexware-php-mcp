@@ -12,5 +12,8 @@
 /.jscpd.json               @Stefan39
 /Makefile                  @Stefan39
 /box.json                  @Stefan39
-/build-tools/              @Stefan39
+# build-tools: scripts stay protected; the extension manifest lists the tools and changes with every
+# new tool, so the agent pipeline may update it (McpbManifestTest keeps it in sync with the server).
+/build-tools/*.sh          @Stefan39
+/build-tools/mcpb/*.sh     @Stefan39
 /renovate.json             @Stefan39
