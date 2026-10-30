@@ -11,6 +11,7 @@ use Jacomeit\LexwarePhpMcp\Lexware\RequestThrottle;
 use Jacomeit\LexwarePhpMcp\Lexware\VoucherList;
 use Jacomeit\LexwarePhpMcp\Output\SensitiveDataFilter;
 use Jacomeit\LexwarePhpMcp\Tool\OpenItemsTool;
+use Jacomeit\LexwarePhpMcp\Tool\SearchVouchersTool;
 use Mcp\Schema\ToolAnnotations;
 use Mcp\Server;
 use Symfony\Component\Clock\NativeClock;
@@ -34,7 +35,9 @@ final class ServerFactory
             'timeout' => 20,
         ] + CaBundle::detectHttpClientOptions());
         $client = new LexwareClient($httpClient, new RequestThrottle($clock), $clock);
-        $openItems = new OpenItemsTool(new VoucherList($client, new SensitiveDataFilter()), $clock);
+        $vouchers = new VoucherList($client, new SensitiveDataFilter());
+        $openItems = new OpenItemsTool($vouchers, $clock);
+        $searchVouchers = new SearchVouchersTool($vouchers);
 
         return Server::builder()
             ->setServerInfo(self::NAME, self::VERSION)
@@ -45,6 +48,13 @@ final class ServerFactory
                 name: OpenItemsTool::NAME,
                 title: 'Open items (unpaid sales invoices)',
                 description: OpenItemsTool::DESCRIPTION,
+                annotations: new ToolAnnotations(readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true),
+            )
+            ->addTool(
+                [$searchVouchers, '__invoke'],
+                name: SearchVouchersTool::NAME,
+                title: 'Search vouchers',
+                description: SearchVouchersTool::DESCRIPTION,
                 annotations: new ToolAnnotations(readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true),
             )
             ->build();

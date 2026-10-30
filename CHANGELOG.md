@@ -7,6 +7,11 @@ contain breaking changes.
 
 ## [Unreleased]
 
+### Added
+
+- Tool `search_vouchers`: search the voucher list by type, status, date range, contact and voucher
+  number (amounts are gross, bank details are removed).
+
 ### Changed
 
 - README: the quick start explains the Claude Desktop warning for the unsigned extension, so users do

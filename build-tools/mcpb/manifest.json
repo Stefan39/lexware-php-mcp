@@ -38,6 +38,10 @@
         {
             "name": "open_items",
             "description": "Unpaid sales invoices (open and overdue), oldest due date first, with days overdue and totals per currency."
+        },
+        {
+            "name": "search_vouchers",
+            "description": "Search vouchers by type, status, date range, contact and number."
         }
     ],
     "user_config": {

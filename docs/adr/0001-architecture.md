@@ -73,7 +73,7 @@ up to 3 attempts with exponential backoff (1 s, 2 s), respecting a numeric `Retr
 | Tool | Endpoint(s) | Status |
 |---|---|---|
 | `open_items`: unpaid sales invoices, overdue flag, days overdue, totals per currency, filters `overdueOnly`, `contact` | `GET /v1/voucherlist?voucherType=invoice,salesinvoice&voucherStatus=open` | **implemented** |
-| `search_vouchers`: by type, status, date range, contact, number | `GET /v1/voucherlist` | planned |
+| `search_vouchers`: by type, status, date range, contact, number | `GET /v1/voucherlist` | **implemented** |
 | `voucher_detail`: line items, net/tax/gross | type-specific detail endpoints | planned |
 | `search_contacts`: by name, email, number (no bank data) | `GET /v1/contacts` | planned |
 | `revenue`: net revenue per period (invoices minus credit notes) | voucher list + detail per voucher (N requests; throttled, cached per run) | planned |

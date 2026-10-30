@@ -6,6 +6,7 @@ namespace Jacomeit\LexwarePhpMcp\Tests;
 
 use Jacomeit\LexwarePhpMcp\ServerFactory;
 use Jacomeit\LexwarePhpMcp\Tool\OpenItemsTool;
+use Jacomeit\LexwarePhpMcp\Tool\SearchVouchersTool;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -22,7 +23,7 @@ final class McpbManifestTest extends TestCase
 
         self::assertSame(ServerFactory::NAME, $manifest['name'] ?? null);
         self::assertSame(ServerFactory::VERSION, $manifest['version'] ?? null);
-        self::assertSame([OpenItemsTool::NAME], array_column($manifest['tools'] ?? [], 'name'));
+        self::assertSame([OpenItemsTool::NAME, SearchVouchersTool::NAME], array_column($manifest['tools'] ?? [], 'name'));
     }
 
     public function testApiKeyIsStoredAsSecretAndPassedViaEnvironment(): void
