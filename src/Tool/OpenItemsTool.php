@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Jacomeit\LexwarePhpMcp\Tool;
 
 use Jacomeit\LexwarePhpMcp\Exception\LexwareApiException;
-use Jacomeit\LexwarePhpMcp\Lexware\LexwareClient;
-use Jacomeit\LexwarePhpMcp\Output\SensitiveDataFilter;
+use Jacomeit\LexwarePhpMcp\Lexware\VoucherFields;
+use Jacomeit\LexwarePhpMcp\Lexware\VoucherList;
 use Mcp\Capability\Attribute\Schema;
 use Mcp\Exception\ToolCallException;
 use Psr\Clock\ClockInterface;
@@ -29,15 +29,12 @@ final readonly class OpenItemsTool
     public const string DESCRIPTION = 'Lists unpaid sales invoices (open and overdue receivables) from Lexware Office, '
         . 'oldest due date first, with totals per currency. Amounts are gross; net amounts need the voucher detail.';
 
-    private const int PAGE_SIZE = 250;
-
     private const string NOTE = 'Amounts are gross (incl. VAT) as delivered by the Lexware voucher list. '
         . 'Includes invoices written in Lexware and booked sales vouchers; down payment invoices, credit notes '
         . 'and invoices collected by SEPA direct debit are not included.';
 
     public function __construct(
-        private LexwareClient $client,
-        private SensitiveDataFilter $filter,
+        private VoucherList $vouchers,
         private ClockInterface $clock,
         private int $maxPages = 10,
     ) {}
@@ -55,7 +52,10 @@ final readonly class OpenItemsTool
         ?string $contact = null,
     ): array {
         try {
-            [$vouchers, $complete] = $this->fetchOpenSalesInvoices();
+            [$vouchers, $complete] = $this->vouchers->fetch([
+                'voucherType' => 'invoice,salesinvoice',
+                'voucherStatus' => 'open',
+            ], $this->maxPages);
         } catch (LexwareApiException $exception) {
             throw new ToolCallException($exception->getMessage(), 0, $exception);
         }
@@ -80,51 +80,26 @@ final readonly class OpenItemsTool
     }
 
     /**
-     * @return array{list<array<mixed>>, bool}
-     */
-    private function fetchOpenSalesInvoices(): array
-    {
-        $vouchers = [];
-        for ($page = 0; $page < $this->maxPages; ++$page) {
-            $response = $this->filter->filter($this->client->getJson('/v1/voucherlist', [
-                'voucherType' => 'invoice,salesinvoice',
-                'voucherStatus' => 'open',
-                'page' => $page,
-                'size' => self::PAGE_SIZE,
-            ]));
-
-            $content = \is_array($response['content'] ?? null) ? $response['content'] : [];
-            array_push($vouchers, ...array_values(array_filter($content, \is_array(...))));
-
-            if (true === ($response['last'] ?? true)) {
-                return [$vouchers, true];
-            }
-        }
-
-        return [$vouchers, false];
-    }
-
-    /**
      * @param array<mixed> $voucher
      *
      * @return OpenItem
      */
     private function toItem(array $voucher, \DateTimeImmutable $today): array
     {
-        $status = self::string($voucher, 'voucherStatus');
-        $dueDate = self::date($voucher, 'dueDate');
+        $status = VoucherFields::string($voucher, 'voucherStatus');
+        $dueDate = VoucherFields::date($voucher, 'dueDate');
         $daysOverdue = null === $dueDate ? 0 : max(0, (int) $dueDate->diff($today)->format('%r%a'));
 
         return [
-            'id' => self::string($voucher, 'id'),
-            'voucherType' => self::string($voucher, 'voucherType'),
-            'voucherNumber' => self::string($voucher, 'voucherNumber'),
-            'contactName' => self::string($voucher, 'contactName'),
-            'voucherDate' => self::date($voucher, 'voucherDate')?->format('Y-m-d'),
+            'id' => VoucherFields::string($voucher, 'id'),
+            'voucherType' => VoucherFields::string($voucher, 'voucherType'),
+            'voucherNumber' => VoucherFields::string($voucher, 'voucherNumber'),
+            'contactName' => VoucherFields::string($voucher, 'contactName'),
+            'voucherDate' => VoucherFields::date($voucher, 'voucherDate')?->format('Y-m-d'),
             'dueDate' => $dueDate?->format('Y-m-d'),
-            'totalAmount' => self::amount($voucher, 'totalAmount'),
-            'openAmount' => self::amount($voucher, 'openAmount'),
-            'currency' => self::string($voucher, 'currency', 'EUR'),
+            'totalAmount' => VoucherFields::amount($voucher, 'totalAmount'),
+            'openAmount' => VoucherFields::amount($voucher, 'openAmount'),
+            'currency' => VoucherFields::string($voucher, 'currency', 'EUR'),
             'status' => $status,
             'overdue' => 'overdue' === $status || $daysOverdue > 0,
             'daysOverdue' => $daysOverdue,
@@ -159,37 +134,6 @@ final readonly class OpenItemsTool
         }
 
         return array_map(static fn(array $sum): array => ['open' => $sum['open'] / 100.0, 'overdue' => $sum['overdue'] / 100.0], $cents);
-    }
-
-    /**
-     * @param array<mixed> $voucher
-     */
-    private static function string(array $voucher, string $key, string $default = ''): string
-    {
-        return \is_string($voucher[$key] ?? null) ? $voucher[$key] : $default;
-    }
-
-    /**
-     * @param array<mixed> $voucher
-     */
-    private static function amount(array $voucher, string $key): float
-    {
-        return \is_int($voucher[$key] ?? null) || \is_float($voucher[$key] ?? null) ? round((float) $voucher[$key], 2) : 0.0;
-    }
-
-    /**
-     * Lexware sends local timestamps; only the calendar date is meaningful for invoices.
-     *
-     * @param array<mixed> $voucher
-     */
-    private static function date(array $voucher, string $key): ?\DateTimeImmutable
-    {
-        $value = self::string($voucher, $key);
-        if (1 !== preg_match('/^\d{4}-\d{2}-\d{2}/', $value, $match)) {
-            return null;
-        }
-
-        return self::toDate($match[0]);
     }
 
     private static function toDate(string $date): \DateTimeImmutable
