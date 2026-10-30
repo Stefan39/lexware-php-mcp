@@ -104,6 +104,11 @@ final class SearchVouchersToolTest extends TestCase
         yield 'impossible day' => ['2026-02-30'];
         yield 'with time' => ['2026-09-01T10:00:00'];
         yield 'text' => ['yesterday'];
+        yield 'empty string' => [''];
+        yield 'only spaces' => ['   '];
+        yield 'surrounding spaces' => [' 2026-09-01 '];
+        yield 'trailing newline' => ["2026-09-01\n"];
+        yield 'embedded null byte' => ["2026-09-01\0x"];
     }
 
     #[DataProvider('invalidDates')]

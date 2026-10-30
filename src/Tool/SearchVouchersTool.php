@@ -108,14 +108,15 @@ final readonly class SearchVouchersTool
 
     private static function validDate(?string $value, string $parameter): ?string
     {
-        $value = self::blankToNull($value);
         if (null === $value) {
             return null;
         }
 
-        $date = \DateTimeImmutable::createFromFormat('!Y-m-d', $value, new \DateTimeZone('UTC'));
+        $date = 1 === preg_match('/^\d{4}-\d{2}-\d{2}$/D', $value)
+            ? \DateTimeImmutable::createFromFormat('!Y-m-d', $value, new \DateTimeZone('UTC'))
+            : false;
         if (false === $date || $date->format('Y-m-d') !== $value) {
-            throw new ToolCallException(\sprintf('%s must be a date in the format YYYY-MM-DD, got "%s".', $parameter, $value));
+            throw new ToolCallException(\sprintf('%s must be a date in the format YYYY-MM-DD, got %s.', $parameter, json_encode($value, JSON_INVALID_UTF8_SUBSTITUTE | JSON_UNESCAPED_UNICODE)));
         }
 
         return $value;
