@@ -6,6 +6,7 @@ namespace Jacomeit\LexwarePhpMcp\Tests\Tool;
 
 use Jacomeit\LexwarePhpMcp\Lexware\LexwareClient;
 use Jacomeit\LexwarePhpMcp\Lexware\RequestThrottle;
+use Jacomeit\LexwarePhpMcp\Lexware\VoucherList;
 use Jacomeit\LexwarePhpMcp\Output\SensitiveDataFilter;
 use Jacomeit\LexwarePhpMcp\Tool\OpenItemsTool;
 use Mcp\Exception\ToolCallException;
@@ -110,7 +111,7 @@ final class OpenItemsToolTest extends TestCase
         $clock = new MockClock('2026-10-10 09:00:00', 'Europe/Berlin');
         $client = new LexwareClient(new MockHttpClient($responses, 'https://api.example.test'), new RequestThrottle($clock), $clock);
 
-        return new OpenItemsTool($client, new SensitiveDataFilter(), $clock, $maxPages);
+        return new OpenItemsTool(new VoucherList($client, new SensitiveDataFilter()), $clock, $maxPages);
     }
 
     /**

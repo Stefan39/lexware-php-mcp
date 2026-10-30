@@ -8,6 +8,7 @@ use Jacomeit\LexwarePhpMcp\Config\CaBundle;
 use Jacomeit\LexwarePhpMcp\Config\Configuration;
 use Jacomeit\LexwarePhpMcp\Lexware\LexwareClient;
 use Jacomeit\LexwarePhpMcp\Lexware\RequestThrottle;
+use Jacomeit\LexwarePhpMcp\Lexware\VoucherList;
 use Jacomeit\LexwarePhpMcp\Output\SensitiveDataFilter;
 use Jacomeit\LexwarePhpMcp\Tool\OpenItemsTool;
 use Mcp\Schema\ToolAnnotations;
@@ -33,7 +34,7 @@ final class ServerFactory
             'timeout' => 20,
         ] + CaBundle::detectHttpClientOptions());
         $client = new LexwareClient($httpClient, new RequestThrottle($clock), $clock);
-        $openItems = new OpenItemsTool($client, new SensitiveDataFilter(), $clock);
+        $openItems = new OpenItemsTool(new VoucherList($client, new SensitiveDataFilter()), $clock);
 
         return Server::builder()
             ->setServerInfo(self::NAME, self::VERSION)
