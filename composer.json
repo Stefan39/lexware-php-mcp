@@ -12,9 +12,9 @@
     ],
     "require": {
         "php": ">=8.4",
-        "mcp/sdk": "^0.8.1",
+        "mcp/sdk": "^0.9",
         "symfony/clock": "^7.4 || ^8.0",
-        "symfony/http-client": "^7.4 || ^8.0"
+        "symfony/http-client": "^7.4.23 || ^8.1.11"
     },
     "autoload": {
         "psr-4": {
@@ -46,5 +46,8 @@
         "phpstan/phpstan-phpunit": "^2",
         "phpstan/phpstan-strict-rules": "^2",
         "phpunit/phpunit": "^12.5"
+    },
+    "conflict": {
+        "symfony/filesystem": "<7.4.23 || >=8.0,<8.1.11"
     }
 }
