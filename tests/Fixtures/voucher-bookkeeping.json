@@ -1,0 +1,18 @@
+{
+  "id": "4f1e8a7c-92d3-4b05-a6c8-1d3e5f7a9b02",
+  "organizationId": "aa93e8a8-2aa3-470b-b8f7-3a1a8f2b1b8c",
+  "type": "salesinvoice",
+  "voucherStatus": "unchecked",
+  "voucherNumber": "ER-4711",
+  "voucherDate": "2026-10-02",
+  "dueDate": "2026-10-16",
+  "contactName": "Lieferant Muster KG",
+  "totalGrossAmount": 226.0,
+  "totalTaxAmount": 36.0,
+  "taxType": "gross",
+  "voucherItems": [
+    {"amount": 119.0, "taxAmount": 19.0, "taxRatePercent": 19, "categoryId": "8f8664a8-fd86-11e1-a21f-0800200c9a66"},
+    {"amount": 107.0, "taxAmount": 7.0, "taxRatePercent": 7, "categoryId": "8f8664a8-fd86-11e1-a21f-0800200c9a66"}
+  ],
+  "bankAccount": {"iban": "DE02120300000000202051"}
+}

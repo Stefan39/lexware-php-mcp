@@ -8,10 +8,12 @@ use Jacomeit\LexwarePhpMcp\Config\CaBundle;
 use Jacomeit\LexwarePhpMcp\Config\Configuration;
 use Jacomeit\LexwarePhpMcp\Lexware\LexwareClient;
 use Jacomeit\LexwarePhpMcp\Lexware\RequestThrottle;
+use Jacomeit\LexwarePhpMcp\Lexware\VoucherDetail;
 use Jacomeit\LexwarePhpMcp\Lexware\VoucherList;
 use Jacomeit\LexwarePhpMcp\Output\SensitiveDataFilter;
 use Jacomeit\LexwarePhpMcp\Tool\OpenItemsTool;
 use Jacomeit\LexwarePhpMcp\Tool\SearchVouchersTool;
+use Jacomeit\LexwarePhpMcp\Tool\VoucherDetailTool;
 use Mcp\Schema\ToolAnnotations;
 use Mcp\Server;
 use Symfony\Component\Clock\NativeClock;
@@ -38,6 +40,7 @@ final class ServerFactory
         $vouchers = new VoucherList($client, new SensitiveDataFilter());
         $openItems = new OpenItemsTool($vouchers, $clock);
         $searchVouchers = new SearchVouchersTool($vouchers);
+        $voucherDetail = new VoucherDetailTool(new VoucherDetail($client, new SensitiveDataFilter()));
 
         return Server::builder()
             ->setServerInfo(self::NAME, self::VERSION)
@@ -55,6 +58,13 @@ final class ServerFactory
                 name: SearchVouchersTool::NAME,
                 title: 'Search vouchers',
                 description: SearchVouchersTool::DESCRIPTION,
+                annotations: new ToolAnnotations(readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true),
+            )
+            ->addTool(
+                [$voucherDetail, '__invoke'],
+                name: VoucherDetailTool::NAME,
+                title: 'Voucher detail',
+                description: VoucherDetailTool::DESCRIPTION,
                 annotations: new ToolAnnotations(readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true),
             )
             ->build();

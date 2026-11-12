@@ -1,0 +1,49 @@
+{
+  "id": "e9066f04-8cc7-4616-93f8-3d24f2a43d3a",
+  "organizationId": "aa93e8a8-2aa3-470b-b8f7-3a1a8f2b1b8c",
+  "createdDate": "2026-09-01T10:00:00.000+02:00",
+  "voucherStatus": "open",
+  "voucherNumber": "RE-2026-0060",
+  "voucherDate": "2026-09-01T00:00:00.000+02:00",
+  "address": {
+    "contactId": "97c5794f-8ac0-4ba1-9a6b-5b2c1e2f3a4b",
+    "name": "Beispiel AG",
+    "street": "Musterstraße 1",
+    "zip": "12345",
+    "city": "Musterstadt",
+    "countryCode": "DE"
+  },
+  "lineItems": [
+    {
+      "id": "97b98491-e953-4dc9-97a9-ae437a8052b4",
+      "type": "custom",
+      "name": "Beratung",
+      "quantity": 10,
+      "unitName": "Stunde",
+      "unitPrice": {"currency": "EUR", "netAmount": 100.0, "grossAmount": 119.0, "taxRatePercentage": 19},
+      "discountPercentage": 0,
+      "lineItemAmount": 1000.0
+    },
+    {
+      "id": "5a1c1c9e-1b8e-4f0a-8d3b-0f6a7b3a9c11",
+      "type": "custom",
+      "name": "Fachbuch",
+      "quantity": 2,
+      "unitName": "Stück",
+      "unitPrice": {"currency": "EUR", "netAmount": 20.0, "grossAmount": 21.4, "taxRatePercentage": 7},
+      "discountPercentage": 0,
+      "lineItemAmount": 40.0
+    },
+    {"type": "text", "name": "Vielen Dank für Ihren Auftrag.", "description": "Zahlbar innerhalb von 14 Tagen."}
+  ],
+  "totalPrice": {"currency": "EUR", "totalNetAmount": 1040.0, "totalGrossAmount": 1232.8, "totalTaxAmount": 192.8},
+  "taxAmounts": [
+    {"taxRatePercentage": 19, "taxAmount": 190.0, "netAmount": 1000.0},
+    {"taxRatePercentage": 7, "taxAmount": 2.8, "netAmount": 40.0}
+  ],
+  "taxConditions": {"taxType": "net"},
+  "paymentConditions": {"paymentTermLabel": "14 Tage netto", "paymentTermDuration": 14},
+  "shippingConditions": {"shippingDate": "2026-09-01T00:00:00.000+02:00", "shippingType": "service"},
+  "bankAccount": {"iban": "DE02120300000000202051", "bic": "BYLADEM1001", "accountHolder": "Beispiel GmbH", "bankName": "Musterbank"},
+  "iban": "DE02120300000000202051"
+}

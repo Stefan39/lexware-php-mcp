@@ -27,7 +27,7 @@ final class ServerSmokeTest extends TestCase
         self::assertSame(ServerFactory::VERSION, $responses[1]['result']['serverInfo']['version'] ?? null);
 
         $tools = array_column($responses[2]['result']['tools'] ?? [], null, 'name');
-        self::assertSame(['open_items', 'search_vouchers'], array_keys($tools));
+        self::assertSame(['open_items', 'search_vouchers', 'voucher_detail'], array_keys($tools));
         foreach ($tools as $tool) {
             self::assertTrue($tool['annotations']['readOnlyHint'] ?? false);
             self::assertFalse($tool['annotations']['destructiveHint'] ?? true);
