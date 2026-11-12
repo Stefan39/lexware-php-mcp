@@ -1,0 +1,21 @@
+{
+  "id": "c2a5d0f1-3b7e-4c1a-9d2e-6f8a1b4c7d90",
+  "voucherStatus": "open",
+  "voucherNumber": "GS-2026-0003",
+  "voucherDate": "2026-09-20T00:00:00.000+02:00",
+  "address": {"name": "Beispiel AG", "countryCode": "DE"},
+  "lineItems": [
+    {
+      "type": "custom",
+      "name": "Gutschrift Beratung",
+      "quantity": 1.5,
+      "unitName": "Stunde",
+      "unitPrice": {"currency": "EUR", "netAmount": 100.0, "grossAmount": 119.0, "taxRatePercentage": 19},
+      "discountPercentage": 0,
+      "lineItemAmount": 150.0
+    }
+  ],
+  "totalPrice": {"currency": "EUR", "totalNetAmount": 150.0, "totalGrossAmount": 178.5, "totalTaxAmount": 28.5},
+  "taxAmounts": [{"taxRatePercentage": 19, "taxAmount": 28.5, "netAmount": 150.0}],
+  "taxConditions": {"taxType": "net"}
+}

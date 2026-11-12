@@ -1,0 +1,22 @@
+{
+  "id": "0d7b3e52-8f14-4a6c-b1d9-2e5c9a7f4b36",
+  "voucherStatus": "paid",
+  "voucherNumber": "AR-2026-0001",
+  "voucherDate": "2026-08-15T00:00:00.000+02:00",
+  "address": {"name": "Muster Bau GmbH", "countryCode": "DE"},
+  "lineItems": [
+    {
+      "type": "custom",
+      "name": "Abschlag 30 %",
+      "quantity": 1,
+      "unitName": "Pauschale",
+      "unitPrice": {"currency": "EUR", "netAmount": 3000.0, "grossAmount": 3570.0, "taxRatePercentage": 19},
+      "discountPercentage": 0,
+      "lineItemAmount": 3000.0
+    }
+  ],
+  "totalPrice": {"currency": "EUR", "totalNetAmount": 3000.0, "totalGrossAmount": 3570.0, "totalTaxAmount": 570.0},
+  "taxAmounts": [{"taxRatePercentage": 19, "taxAmount": 570.0, "netAmount": 3000.0}],
+  "taxConditions": {"taxType": "net"},
+  "bankAccount": {"iban": "DE02120300000000202051", "bic": "BYLADEM1001"}
+}

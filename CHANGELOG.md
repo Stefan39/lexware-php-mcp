@@ -11,6 +11,8 @@ contain breaking changes.
 
 - Tool `search_vouchers`: search the voucher list by type, status, date range, contact and voucher
   number (amounts are gross, bank details are removed).
+- Tool `voucher_detail`: line items and net, tax and gross amounts of one voucher (invoice, credit note,
+  down-payment invoice or bookkeeping voucher); the voucher type selects the detail endpoint.
 
 ### Changed
 

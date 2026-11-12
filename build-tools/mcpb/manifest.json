@@ -42,6 +42,10 @@
         {
             "name": "search_vouchers",
             "description": "Search vouchers by type, status, date range, contact and number."
+        },
+        {
+            "name": "voucher_detail",
+            "description": "Line items and net, tax and gross amounts of one voucher."
         }
     ],
     "user_config": {
