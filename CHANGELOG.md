@@ -7,6 +7,13 @@ contain breaking changes.
 
 ## [Unreleased]
 
+### Security
+
+- `mcp/sdk` 0.9 (PKSA-s52d-n7sx-trsg, OAuth middleware without request body limit; the stdio server
+  was not affected) and `symfony/http-client` at least 7.4.23 / 8.1.11 (CVE-2026-121971,
+  CVE-2026-123119). The dev dependency `symfony/filesystem` is held off the affected versions via
+  `conflict` (PKSA-g499-cm4q-v35y). `composer audit` is clean again (JAC-973).
+
 ### Added
 
 - Tool `search_vouchers`: search the voucher list by type, status, date range, contact and voucher
