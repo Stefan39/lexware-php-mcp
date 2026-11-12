@@ -114,7 +114,7 @@ final readonly class VoucherDetail
         $lineItems = [];
         $byRate = [];
         foreach (self::maps($voucher, 'voucherItems') as $item) {
-            $rate = self::optionalNumber($item, 'taxRatePercentage');
+            $rate = self::optionalNumber($item, 'taxRatePercent');
             $amount = self::optionalNumber($item, 'amount');
             $amounts = self::netAndGross($amount, $rate, $gross);
             $lineItems[] = ['name' => null, 'quantity' => null, 'unitName' => null, ...$amounts, 'taxRatePercentage' => $rate];

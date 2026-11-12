@@ -11,8 +11,8 @@
   "totalTaxAmount": 36.0,
   "taxType": "gross",
   "voucherItems": [
-    {"amount": 119.0, "taxAmount": 19.0, "taxRatePercentage": 19, "categoryId": "8f8664a8-fd86-11e1-a21f-0800200c9a66"},
-    {"amount": 107.0, "taxAmount": 7.0, "taxRatePercentage": 7, "categoryId": "8f8664a8-fd86-11e1-a21f-0800200c9a66"}
+    {"amount": 119.0, "taxAmount": 19.0, "taxRatePercent": 19, "categoryId": "8f8664a8-fd86-11e1-a21f-0800200c9a66"},
+    {"amount": 107.0, "taxAmount": 7.0, "taxRatePercent": 7, "categoryId": "8f8664a8-fd86-11e1-a21f-0800200c9a66"}
   ],
   "bankAccount": {"iban": "DE02120300000000202051"}
 }
