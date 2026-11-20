@@ -103,19 +103,21 @@ final readonly class RevenueTool
             // The last day on the pages read may continue on the next page, so it is left for the follow-up call.
             $partialDay = array_key_last($days);
             unset($days[$partialDay]);
-            if ([] === $days && null !== $partialDay) {
-                throw new ToolCallException(\sprintf('More vouchers on %s than fit into the voucher list pages read per call.', $partialDay));
+            if ([] === $days) {
+                throw new ToolCallException(\sprintf('More vouchers on %s than fit into the voucher list pages read per call.', $partialDay ?? $dateFrom));
             }
         }
 
         $complete = $listComplete;
-        $coveredUntil = $listComplete ? $dateTo : array_key_last($days) ?? $dateFrom;
+        $coveredUntil = $listComplete ? $dateTo : array_key_last($days);
         $budget = $this->maxDetailRequests;
         $lastDay = null;
         $sums = [];
         $periodSums = [];
         foreach ($days as $day => $vouchers) {
-            $uncached = \count(array_filter($vouchers, fn(array $voucher): bool => null === $this->cache->get($voucher['id'], $voucher['updatedDate'])));
+            // Cache hits are held here, because storing the missing details could evict them from the cache.
+            $cached = array_map(fn(array $voucher): ?array => $this->cache->get($voucher['id'], $voucher['updatedDate']), $vouchers);
+            $uncached = \count(array_filter($cached, static fn(?array $detail): bool => null === $detail));
             if ($uncached > $budget) {
                 if (null === $lastDay) {
                     throw new ToolCallException(\sprintf('%d vouchers on %s; at most %d per call.', \count($vouchers), $day, $this->maxDetailRequests));
@@ -127,8 +129,8 @@ final readonly class RevenueTool
             $budget -= $uncached;
             $lastDay = $day;
 
-            foreach ($vouchers as $voucher) {
-                $detail = $this->detail($voucher);
+            foreach ($vouchers as $index => $voucher) {
+                $detail = $cached[$index] ?? $this->fetchDetail($voucher);
                 $sums = self::add($sums, $voucher['isCreditNote'], $detail);
                 if ($byMonth) {
                     $month = substr($day, 0, 7);
@@ -146,6 +148,7 @@ final readonly class RevenueTool
             'totals' => self::totals($sums),
         ];
         if ($byMonth) {
+            $result['periods'] = [];
             ksort($periodSums, SORT_STRING);
             foreach ($periodSums as $period => $periodSum) {
                 $result['periods'][] = ['period' => $period, 'totals' => self::totals($periodSum)];
@@ -196,13 +199,10 @@ final readonly class RevenueTool
      *
      * @throws LexwareApiException
      */
-    private function detail(array $voucher): array
+    private function fetchDetail(array $voucher): array
     {
-        $detail = $this->cache->get($voucher['id'], $voucher['updatedDate']);
-        if (null === $detail) {
-            $detail = $this->details->fetch($voucher['type'], $voucher['id'], $voucher['path'], roundTotals: false);
-            $this->cache->put($voucher['id'], $voucher['updatedDate'], $detail);
-        }
+        $detail = $this->details->fetch($voucher['type'], $voucher['id'], $voucher['path'], roundTotals: false);
+        $this->cache->put($voucher['id'], $voucher['updatedDate'], $detail);
 
         return $detail;
     }

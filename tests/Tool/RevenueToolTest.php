@@ -332,6 +332,40 @@ final class RevenueToolTest extends TestCase
         self::assertTrue($result['complete']);
         self::assertSame(30.0, $result['totals'][0]['netRevenue']);
     }
+
+    public function testEvictionWhileReadingADayDoesNotExceedCap(): void
+    {
+        $vouchers = $this->vouchersOn(['2026-09-01', '2026-09-01']);
+        $tool = $this->createTool([
+            $this->listOf([$vouchers[1]]),
+            $this->smallInvoice(10.0),
+            $this->listOf($vouchers),
+            $this->smallInvoice(10.0),
+        ], maxDetailRequests: 1, cache: new VoucherDetailCache(1));
+
+        $tool('2026-09-01', '2026-09-30');
+        $result = $tool('2026-09-01', '2026-09-30');
+
+        self::assertCount(4, $this->responses);
+        self::assertTrue($result['complete']);
+        self::assertSame(20.0, $result['totals'][0]['netRevenue']);
+    }
+
+    public function testMonthGroupingWithoutCountedVouchersHasEmptyPeriods(): void
+    {
+        $result = $this->createTool([$this->emptyList()])('2026-09-01', '2026-09-30', 'month');
+
+        self::assertSame([], $result['periods'] ?? null);
+    }
+
+    public function testListPageCapWithoutUsableVouchersIsToolError(): void
+    {
+        $list = new MockResponse(json_encode(['content' => [], 'first' => true, 'last' => false, 'number' => 0], \JSON_THROW_ON_ERROR));
+
+        $this->expectException(ToolCallException::class);
+        $this->createTool([$list], maxPages: 1)('2026-09-01', '2026-09-30');
+    }
+
     public function testLexwareErrorFromListBecomesToolError(): void
     {
         $this->expectException(ToolCallException::class);
