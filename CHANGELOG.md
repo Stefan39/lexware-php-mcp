@@ -16,6 +16,9 @@ contain breaking changes.
 
 ### Added
 
+- Tool `revenue`: optional `groupBy=month` adds totals per calendar month; ranges with more than 100 detail
+  requests return `complete: false` and `coveredUntil` for a follow-up call instead of an error; voucher
+  details are cached in memory per server process (key id + `updatedDate`, 2000 entries).
 - Tool `revenue`: net revenue of a voucher date range (invoices minus credit notes) per currency, with tax
   and gross; reads one voucher detail per voucher, at most 100 per call (larger ranges are rejected).
 - Tool `search_contacts`: search contacts by name, e-mail, number and role (customer or vendor); private
@@ -34,6 +37,9 @@ contain breaking changes.
 
 ### Added
 
+- Tool `revenue`: optional `groupBy=month` adds totals per calendar month; ranges with more than 100 detail
+  requests return `complete: false` and `coveredUntil` for a follow-up call instead of an error; voucher
+  details are cached in memory per server process (key id + `updatedDate`, 2000 entries).
 - Tool `revenue`: net revenue of a voucher date range (invoices minus credit notes) per currency, with tax
   and gross; reads one voucher detail per voucher, at most 100 per call (larger ranges are rejected).
 - Setup without PHP: every release now contains a Claude Desktop extension (`.mcpb`) for macOS and
@@ -69,6 +75,9 @@ First release.
 
 ### Added
 
+- Tool `revenue`: optional `groupBy=month` adds totals per calendar month; ranges with more than 100 detail
+  requests return `complete: false` and `coveredUntil` for a follow-up call instead of an error; voucher
+  details are cached in memory per server process (key id + `updatedDate`, 2000 entries).
 - Tool `revenue`: net revenue of a voucher date range (invoices minus credit notes) per currency, with tax
   and gross; reads one voucher detail per voucher, at most 100 per call (larger ranges are rejected).
 - MCP server over stdio for Claude Desktop and other MCP clients, built on the official PHP MCP SDK (`mcp/sdk` 0.8).

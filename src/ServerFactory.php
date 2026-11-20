@@ -10,6 +10,7 @@ use Jacomeit\LexwarePhpMcp\Lexware\LexwareClient;
 use Jacomeit\LexwarePhpMcp\Lexware\PagedList;
 use Jacomeit\LexwarePhpMcp\Lexware\RequestThrottle;
 use Jacomeit\LexwarePhpMcp\Lexware\VoucherDetail;
+use Jacomeit\LexwarePhpMcp\Lexware\VoucherDetailCache;
 use Jacomeit\LexwarePhpMcp\Lexware\VoucherList;
 use Jacomeit\LexwarePhpMcp\Output\SensitiveDataFilter;
 use Jacomeit\LexwarePhpMcp\Tool\OpenItemsTool;
@@ -46,7 +47,7 @@ final class ServerFactory
         $searchContacts = new SearchContactsTool(new PagedList($client, new SensitiveDataFilter(), '/v1/contacts'));
         $voucherDetails = new VoucherDetail($client, new SensitiveDataFilter());
         $voucherDetail = new VoucherDetailTool($voucherDetails);
-        $revenue = new RevenueTool($vouchers, $voucherDetails);
+        $revenue = new RevenueTool($vouchers, $voucherDetails, new VoucherDetailCache());
 
         return Server::builder()
             ->setServerInfo(self::NAME, self::VERSION)
