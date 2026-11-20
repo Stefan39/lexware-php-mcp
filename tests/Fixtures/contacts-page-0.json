@@ -1,0 +1,25 @@
+{
+  "content": [
+    {
+      "id": "e9066f04-0000-0000-0000-000000000011",
+      "version": 1,
+      "roles": {"customer": {"number": 10011}},
+      "company": {"name": "Berta Beispiel AG", "contactPersons": []},
+      "archived": false
+    },
+    {
+      "id": "e9066f04-0000-0000-0000-000000000012",
+      "version": 1,
+      "roles": {"customer": {"number": 10012}},
+      "company": {"name": "Anton Muster GmbH", "contactPersons": []},
+      "archived": false
+    }
+  ],
+  "first": true,
+  "last": false,
+  "totalPages": 2,
+  "totalElements": 3,
+  "numberOfElements": 2,
+  "size": 250,
+  "number": 0
+}

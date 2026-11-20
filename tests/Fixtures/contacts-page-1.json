@@ -1,0 +1,18 @@
+{
+  "content": [
+    {
+      "id": "e9066f04-0000-0000-0000-000000000013",
+      "version": 1,
+      "roles": {"vendor": {"number": 70013}},
+      "company": {"name": "Cäsar Handel OHG", "contactPersons": []},
+      "archived": false
+    }
+  ],
+  "first": false,
+  "last": true,
+  "totalPages": 2,
+  "totalElements": 3,
+  "numberOfElements": 1,
+  "size": 250,
+  "number": 1
+}

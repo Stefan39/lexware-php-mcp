@@ -11,12 +11,12 @@ use Jacomeit\LexwarePhpMcp\Output\SensitiveDataFilter;
  */
 final readonly class VoucherList
 {
-    private const int PAGE_SIZE = 250;
+    private PagedList $pages;
 
-    public function __construct(
-        private LexwareClient $client,
-        private SensitiveDataFilter $filter,
-    ) {}
+    public function __construct(LexwareClient $client, SensitiveDataFilter $filter)
+    {
+        $this->pages = new PagedList($client, $filter, '/v1/voucherlist');
+    }
 
     /**
      * @param array<string, scalar> $query    Filter parameters; "page" and "size" are set here
@@ -26,22 +26,6 @@ final readonly class VoucherList
      */
     public function fetch(array $query, int $maxPages): array
     {
-        $vouchers = [];
-        for ($page = 0; $page < $maxPages; ++$page) {
-            $response = $this->filter->filter($this->client->getJson('/v1/voucherlist', [
-                ...$query,
-                'page' => $page,
-                'size' => self::PAGE_SIZE,
-            ]));
-
-            $content = \is_array($response['content'] ?? null) ? $response['content'] : [];
-            array_push($vouchers, ...array_values(array_filter($content, \is_array(...))));
-
-            if (true === ($response['last'] ?? true)) {
-                return [$vouchers, true];
-            }
-        }
-
-        return [$vouchers, false];
+        return $this->pages->fetch($query, $maxPages);
     }
 }

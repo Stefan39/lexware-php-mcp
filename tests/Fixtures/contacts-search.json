@@ -1,0 +1,161 @@
+{
+  "content": [
+    {
+      "id": "e9066f04-0000-0000-0000-000000000003",
+      "version": 4,
+      "roles": {
+        "vendor": {
+          "number": 70001
+        }
+      },
+      "company": {
+        "name": "Zeta Lieferant KG",
+        "contactPersons": []
+      },
+      "addresses": {
+        "billing": [
+          {
+            "supplement": "Hinterhaus",
+            "street": "Lagerweg 3",
+            "zip": "20095",
+            "city": "Hamburg",
+            "countryCode": "DE"
+          }
+        ]
+      },
+      "emailAddresses": {
+        "business": ["einkauf@zeta-lieferant.example"]
+      },
+      "phoneNumbers": {},
+      "note": "Interne Notiz: Zahlungsziel verhandelt",
+      "archived": true
+    },
+    {
+      "id": "e9066f04-0000-0000-0000-000000000001",
+      "organizationId": "aa93e8a8-0000-0000-0000-000000000000",
+      "version": 7,
+      "roles": {
+        "customer": {
+          "number": 10001
+        },
+        "vendor": {
+          "number": 70002
+        }
+      },
+      "company": {
+        "name": "Acme Beispiel GmbH",
+        "taxNumber": "12345/67890",
+        "vatRegistrationId": "DE123456789",
+        "allowTaxFreeInvoices": false,
+        "contactPersons": [
+          {
+            "salutation": "Frau",
+            "firstName": "Erika",
+            "lastName": "Musterfrau",
+            "emailAddress": "erika.musterfrau@acme-beispiel.example",
+            "phoneNumber": "+49 40 1234567",
+            "primary": true
+          },
+          {
+            "firstName": "Max",
+            "lastName": "Beispiel",
+            "emailAddress": "max.beispiel@acme-beispiel.example",
+            "phoneNumber": "+49 40 7654321"
+          }
+        ]
+      },
+      "addresses": {
+        "billing": [
+          {
+            "supplement": "Haus A",
+            "street": "Musterstraße 1",
+            "zip": "20095",
+            "city": "Hamburg",
+            "countryCode": "DE"
+          },
+          {
+            "street": "Zweitweg 2",
+            "zip": "10115",
+            "city": "Berlin",
+            "countryCode": "DE"
+          }
+        ],
+        "shipping": [
+          {
+            "street": "Lieferweg 9",
+            "zip": "22767",
+            "city": "Hamburg",
+            "countryCode": "DE"
+          }
+        ]
+      },
+      "xRechnung": {
+        "buyerReference": "04011000-12345-34",
+        "vendorNumberAtCustomer": "V-4711"
+      },
+      "emailAddresses": {
+        "business": ["info@acme-beispiel.example"],
+        "office": ["buchhaltung@acme-beispiel.example", "info@acme-beispiel.example"],
+        "private": [],
+        "other": []
+      },
+      "phoneNumbers": {
+        "business": ["+49 40 111111"],
+        "mobile": ["+49 170 2222222"],
+        "fax": ["+49 40 333333"]
+      },
+      "note": "Interne Notiz: Rabatt 5 %",
+      "archived": false
+    },
+    {
+      "id": "e9066f04-0000-0000-0000-000000000002",
+      "version": 2,
+      "roles": {
+        "customer": {
+          "number": 10002
+        }
+      },
+      "person": {
+        "salutation": "Herr",
+        "firstName": "Hans",
+        "lastName": "Privatkunde"
+      },
+      "addresses": {
+        "billing": [
+          {
+            "street": "Privatweg 5",
+            "zip": "80331",
+            "city": "München",
+            "countryCode": "DE"
+          }
+        ]
+      },
+      "emailAddresses": {
+        "private": ["hans.privatkunde@example.test"]
+      },
+      "phoneNumbers": {
+        "private": ["+49 89 5555555"],
+        "mobile": ["+49 171 6666666"]
+      },
+      "note": "Privat: Kind hat Allergie",
+      "archived": false
+    },
+    {
+      "id": "e9066f04-0000-0000-0000-000000000004",
+      "version": 1,
+      "roles": {},
+      "person": {
+        "firstName": "Anna",
+        "lastName": "Ohnerolle"
+      },
+      "archived": false
+    }
+  ],
+  "first": true,
+  "last": true,
+  "totalPages": 1,
+  "totalElements": 4,
+  "numberOfElements": 4,
+  "size": 250,
+  "number": 0
+}

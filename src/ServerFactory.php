@@ -7,11 +7,13 @@ namespace Jacomeit\LexwarePhpMcp;
 use Jacomeit\LexwarePhpMcp\Config\CaBundle;
 use Jacomeit\LexwarePhpMcp\Config\Configuration;
 use Jacomeit\LexwarePhpMcp\Lexware\LexwareClient;
+use Jacomeit\LexwarePhpMcp\Lexware\PagedList;
 use Jacomeit\LexwarePhpMcp\Lexware\RequestThrottle;
 use Jacomeit\LexwarePhpMcp\Lexware\VoucherDetail;
 use Jacomeit\LexwarePhpMcp\Lexware\VoucherList;
 use Jacomeit\LexwarePhpMcp\Output\SensitiveDataFilter;
 use Jacomeit\LexwarePhpMcp\Tool\OpenItemsTool;
+use Jacomeit\LexwarePhpMcp\Tool\SearchContactsTool;
 use Jacomeit\LexwarePhpMcp\Tool\SearchVouchersTool;
 use Jacomeit\LexwarePhpMcp\Tool\VoucherDetailTool;
 use Mcp\Schema\ToolAnnotations;
@@ -40,6 +42,7 @@ final class ServerFactory
         $vouchers = new VoucherList($client, new SensitiveDataFilter());
         $openItems = new OpenItemsTool($vouchers, $clock);
         $searchVouchers = new SearchVouchersTool($vouchers);
+        $searchContacts = new SearchContactsTool(new PagedList($client, new SensitiveDataFilter(), '/v1/contacts'));
         $voucherDetail = new VoucherDetailTool(new VoucherDetail($client, new SensitiveDataFilter()));
 
         return Server::builder()
@@ -65,6 +68,13 @@ final class ServerFactory
                 name: VoucherDetailTool::NAME,
                 title: 'Voucher detail',
                 description: VoucherDetailTool::DESCRIPTION,
+                annotations: new ToolAnnotations(readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true),
+            )
+            ->addTool(
+                [$searchContacts, '__invoke'],
+                name: SearchContactsTool::NAME,
+                title: 'Search contacts',
+                description: SearchContactsTool::DESCRIPTION,
                 annotations: new ToolAnnotations(readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true),
             )
             ->build();
