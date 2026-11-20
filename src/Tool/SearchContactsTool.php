@@ -37,7 +37,7 @@ final readonly class SearchContactsTool
     /**
      * @param ?string         $name   Part of the contact name (at least 3 characters)
      * @param ?string         $email  Part of an e-mail address (at least 3 characters)
-     * @param int|string|null $number Customer or vendor number
+     * @param mixed           $number Customer or vendor number; untyped so the SDK does not coerce it before validation
      * @param string          $role   "customer", "vendor" or "any"
      * @param int             $limit  Number of contacts returned (1 to 250)
      *
@@ -48,8 +48,8 @@ final readonly class SearchContactsTool
         ?string $name = null,
         #[Schema(description: 'Part of an e-mail address, at least 3 characters.')]
         ?string $email = null,
-        #[Schema(description: 'Customer or vendor number (integer).')]
-        int|string|null $number = null,
+        #[Schema(type: 'integer', description: 'Customer or vendor number (integer).')]
+        mixed $number = null,
         #[Schema(description: 'Contact role: "customer", "vendor" or "any".')]
         string $role = 'any',
         #[Schema(description: 'Number of contacts returned, 1 to 250.')]
@@ -100,13 +100,13 @@ final readonly class SearchContactsTool
         return $value;
     }
 
-    private static function number(int|string|null $value): ?int
+    private static function number(mixed $value): ?int
     {
-        if (\is_string($value)) {
-            throw new ToolCallException(\sprintf('number must be an integer, got %s.', json_encode($value, JSON_INVALID_UTF8_SUBSTITUTE | JSON_UNESCAPED_UNICODE)));
+        if (null === $value || \is_int($value)) {
+            return $value;
         }
 
-        return $value;
+        throw new ToolCallException(\sprintf('number must be an integer, got %s.', json_encode($value, JSON_INVALID_UTF8_SUBSTITUTE | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR)));
     }
 
     /**

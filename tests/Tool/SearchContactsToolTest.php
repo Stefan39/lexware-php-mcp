@@ -9,7 +9,11 @@ use Jacomeit\LexwarePhpMcp\Lexware\PagedList;
 use Jacomeit\LexwarePhpMcp\Lexware\RequestThrottle;
 use Jacomeit\LexwarePhpMcp\Output\SensitiveDataFilter;
 use Jacomeit\LexwarePhpMcp\Tool\SearchContactsTool;
+use Mcp\Capability\Registry\ElementReference;
+use Mcp\Capability\Registry\ReferenceHandler;
 use Mcp\Exception\ToolCallException;
+use Mcp\Server\Session\InMemorySessionStore;
+use Mcp\Server\Session\Session;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
@@ -131,6 +135,40 @@ final class SearchContactsToolTest extends TestCase
             self::assertStringContainsString('number must be an integer', $exception->getMessage());
         }
         self::assertSame([], $this->responses);
+    }
+
+    /**
+     * @return iterable<string, array{mixed}>
+     */
+    public static function nonIntegerNumbersFromClient(): iterable
+    {
+        yield 'boolean' => [true];
+        yield 'fraction' => [1.5];
+        yield 'numeric string' => ['10001'];
+        yield 'array' => [[1]];
+    }
+
+    #[DataProvider('nonIntegerNumbersFromClient')]
+    public function testSdkCallRejectsNonIntegerNumberWithoutCoercion(mixed $number): void
+    {
+        $tool = $this->createTool([]);
+
+        try {
+            new ReferenceHandler()->handle(new ElementReference([$tool, '__invoke']), ['number' => $number, '_session' => new Session(new InMemorySessionStore())]);
+            self::fail('Expected ToolCallException');
+        } catch (ToolCallException $exception) {
+            self::assertStringContainsString('number must be an integer', $exception->getMessage());
+        }
+        self::assertSame([], $this->responses);
+    }
+
+    public function testSdkCallPassesIntegerNumber(): void
+    {
+        $tool = $this->createTool([$this->fixture('search')]);
+
+        new ReferenceHandler()->handle(new ElementReference([$tool, '__invoke']), ['number' => 10001, '_session' => new Session(new InMemorySessionStore())]);
+
+        self::assertSame('10001', $this->query(0)['number']);
     }
 
     public function testRejectsMissingFilter(): void
