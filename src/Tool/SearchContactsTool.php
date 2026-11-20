@@ -88,10 +88,11 @@ final readonly class SearchContactsTool
 
     private static function text(?string $value, string $parameter): ?string
     {
-        $value = trim($value ?? '');
-        if ('' === $value) {
+        if (null === $value) {
             return null;
         }
+
+        $value = trim($value);
         if (mb_strlen($value) < self::MIN_TEXT_LENGTH) {
             throw new ToolCallException(\sprintf('%s must have at least %d characters (Lexware requirement), got %d.', $parameter, self::MIN_TEXT_LENGTH, mb_strlen($value)));
         }
@@ -101,19 +102,11 @@ final readonly class SearchContactsTool
 
     private static function number(int|string|null $value): ?int
     {
-        if (!\is_string($value)) {
-            return $value;
-        }
-
-        $value = trim($value);
-        if ('' === $value) {
-            return null;
-        }
-        if (1 !== preg_match('/^\d{1,15}$/D', $value)) {
+        if (\is_string($value)) {
             throw new ToolCallException(\sprintf('number must be an integer, got %s.', json_encode($value, JSON_INVALID_UTF8_SUBSTITUTE | JSON_UNESCAPED_UNICODE)));
         }
 
-        return (int) $value;
+        return $value;
     }
 
     /**
@@ -121,8 +114,8 @@ final readonly class SearchContactsTool
      */
     private static function roleQuery(string $role): array
     {
-        return match (strtolower(trim($role))) {
-            '', 'any' => [],
+        return match ($role) {
+            'any' => [],
             'customer' => ['customer' => 'true'],
             'vendor' => ['vendor' => 'true'],
             default => throw new ToolCallException(\sprintf('role must be "customer", "vendor" or "any", got %s.', json_encode($role, JSON_INVALID_UTF8_SUBSTITUTE | JSON_UNESCAPED_UNICODE))),

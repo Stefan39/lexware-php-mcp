@@ -29,13 +29,6 @@ final class SearchContactsToolTest extends TestCase
         self::assertSame(['name' => 'Acme', 'email' => 'info@acme', 'number' => '10001', 'page' => '0', 'size' => '250'], $this->query(0));
     }
 
-    public function testAcceptsNumericStringAsNumber(): void
-    {
-        $this->createTool([$this->fixture('search')])(number: ' 10001 ');
-
-        self::assertSame('10001', $this->query(0)['number']);
-    }
-
     public function testRoleCustomerSendsCustomerFlag(): void
     {
         $this->createTool([$this->fixture('search')])(role: 'customer');
@@ -58,12 +51,25 @@ final class SearchContactsToolTest extends TestCase
         self::assertArrayNotHasKey('vendor', $this->query(0));
     }
 
-    public function testRejectsUnknownRole(): void
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function invalidRoles(): iterable
+    {
+        yield 'unknown' => ['supplier'];
+        yield 'empty' => [''];
+        yield 'blank' => [' '];
+        yield 'upper case' => ['Customer'];
+        yield 'padded' => [' vendor '];
+    }
+
+    #[DataProvider('invalidRoles')]
+    public function testRejectsInvalidRole(string $role): void
     {
         $this->expectException(ToolCallException::class);
         $this->expectExceptionMessageMatches('/role must be "customer", "vendor" or "any"/');
 
-        $this->createTool([])(name: 'Acme', role: 'supplier');
+        $this->createTool([])(name: 'Acme', role: $role);
     }
 
     /**
@@ -75,6 +81,8 @@ final class SearchContactsToolTest extends TestCase
         yield 'two characters' => ['ab'];
         yield 'two characters with spaces' => ['  ab  '];
         yield 'two multibyte characters' => ['äö'];
+        yield 'empty' => [''];
+        yield 'blank' => ['   '];
     }
 
     #[DataProvider('shortTexts')]
@@ -108,6 +116,9 @@ final class SearchContactsToolTest extends TestCase
         yield 'negative' => ['-5'];
         yield 'embedded space' => ['1 001'];
         yield 'too long' => ['1234567890123456'];
+        yield 'numeric string' => ['10001'];
+        yield 'empty' => [''];
+        yield 'blank' => [' '];
     }
 
     #[DataProvider('invalidNumbers')]
@@ -124,7 +135,7 @@ final class SearchContactsToolTest extends TestCase
 
     public function testRejectsMissingFilter(): void
     {
-        foreach ([[], ['role' => 'any'], ['name' => '  ', 'email' => '', 'number' => ' ']] as $arguments) {
+        foreach ([[], ['role' => 'any']] as $arguments) {
             try {
                 $this->createTool([])(...$arguments);
                 self::fail('Expected ToolCallException');
