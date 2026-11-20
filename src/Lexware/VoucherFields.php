@@ -20,9 +20,13 @@ final class VoucherFields
     /**
      * @param array<mixed> $voucher
      */
-    public static function amount(array $voucher, string $key): float
+    public static function amount(array $voucher, string $key, bool $rounded = true): float
     {
-        return \is_int($voucher[$key] ?? null) || \is_float($voucher[$key] ?? null) ? round((float) $voucher[$key], 2) : 0.0;
+        if (!\is_int($voucher[$key] ?? null) && !\is_float($voucher[$key] ?? null)) {
+            return 0.0;
+        }
+
+        return $rounded ? round((float) $voucher[$key], 2) : (float) $voucher[$key];
     }
 
     /**

@@ -99,7 +99,7 @@ final readonly class RevenueTool
                 continue;
             }
 
-            $detail = $this->details->fetch($type, $id, $path);
+            $detail = $this->details->fetch($type, $id, $path, roundTotals: false);
             $sum = $sums[$detail['currency']] ?? ['invoiceCount' => 0, 'creditNoteCount' => 0, 'invoices' => [0.0, 0.0, 0.0], 'creditNotes' => [0.0, 0.0, 0.0]];
             $key = $isCreditNote ? 'creditNotes' : 'invoices';
             $sum[$isCreditNote ? 'creditNoteCount' : 'invoiceCount']++;

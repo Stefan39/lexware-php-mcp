@@ -134,10 +134,10 @@ final class RevenueToolTest extends TestCase
             ['id' => 'e9066f04-8cc7-4616-93f8-3d24f2a43d3b', 'voucherType' => 'invoice'],
         ]);
 
-        $result = $this->createTool([$list, $this->smallInvoice(0.1), $this->smallInvoice(0.2)])('2026-09-01', '2026-09-30');
+        $result = $this->createTool([$list, $this->smallInvoice(0.004), $this->smallInvoice(0.004)])('2026-09-01', '2026-09-30');
 
-        self::assertSame(0.3, $result['totals'][0]['netRevenue']);
-        self::assertSame(0.3, $result['totals'][0]['invoicesNet']);
+        self::assertSame(0.01, $result['totals'][0]['netRevenue']);
+        self::assertSame(0.01, $result['totals'][0]['invoicesNet']);
     }
 
     public function testOutputContainsNoContactNamesOrBankData(): void
