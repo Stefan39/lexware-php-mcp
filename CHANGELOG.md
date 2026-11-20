@@ -16,6 +16,8 @@ contain breaking changes.
 
 ### Added
 
+- Tool `search_contacts`: search contacts by name, e-mail, number and role (customer or vendor); private
+  persons are reduced to name, numbers and archived flag, bank details and notes are never returned.
 - Tool `search_vouchers`: search the voucher list by type, status, date range, contact and voucher
   number (amounts are gross, bank details are removed).
 - Tool `voucher_detail`: line items and net, tax and gross amounts of one voucher (invoice, credit note,

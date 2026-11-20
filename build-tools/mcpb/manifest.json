@@ -46,6 +46,10 @@
         {
             "name": "voucher_detail",
             "description": "Line items and net, tax and gross amounts of one voucher."
+        },
+        {
+            "name": "search_contacts",
+            "description": "Search contacts by name, e-mail, number and role (customer or vendor)."
         }
     ],
     "user_config": {
