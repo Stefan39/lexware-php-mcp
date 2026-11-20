@@ -43,7 +43,7 @@ runtime to give an AI assistant access to their bookkeeping.
 
 ## Status
 
-v0.3.0, early but usable. See the [changelog](CHANGELOG.md). Currently available tools:
+v0.4.0, early but usable. See the [changelog](CHANGELOG.md). Currently available tools:
 
 | Tool | What it does |
 |---|---|
@@ -137,7 +137,7 @@ Requirements:
 - Composer
 
 ```bash
-git clone --branch v0.3.0 https://github.com/Stefan39/lexware-php-mcp.git
+git clone --branch v0.4.0 https://github.com/Stefan39/lexware-php-mcp.git
 cd lexware-php-mcp
 composer install --no-dev
 ```

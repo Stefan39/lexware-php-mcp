@@ -7,6 +7,8 @@ contain breaking changes.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-20
+
 ### Security
 
 - `mcp/sdk` 0.9 (PKSA-s52d-n7sx-trsg, OAuth middleware without request body limit; the stdio server
@@ -16,11 +18,11 @@ contain breaking changes.
 
 ### Added
 
-- Tool `revenue`: optional `groupBy=month` adds totals per calendar month; ranges with more than 100 detail
-  requests return `complete: false` and `coveredUntil` for a follow-up call instead of an error; voucher
-  details are cached in memory per server process (key id + `updatedDate`, 2000 entries).
 - Tool `revenue`: net revenue of a voucher date range (invoices minus credit notes) per currency, with tax
-  and gross; reads one voucher detail per voucher, at most 100 per call (larger ranges are rejected).
+  and gross; reads one voucher detail per voucher, at most 100 per call. Larger ranges return
+  `complete: false` and `coveredUntil` for a follow-up call; optional `groupBy=month` adds totals per
+  calendar month; voucher details are cached in memory per server process (key id + `updatedDate`,
+  2000 entries).
 - Tool `search_contacts`: search contacts by name, e-mail, number and role (customer or vendor); private
   persons are reduced to name, numbers and archived flag, bank details and notes are never returned.
 - Tool `search_vouchers`: search the voucher list by type, status, date range, contact and voucher
@@ -37,11 +39,6 @@ contain breaking changes.
 
 ### Added
 
-- Tool `revenue`: optional `groupBy=month` adds totals per calendar month; ranges with more than 100 detail
-  requests return `complete: false` and `coveredUntil` for a follow-up call instead of an error; voucher
-  details are cached in memory per server process (key id + `updatedDate`, 2000 entries).
-- Tool `revenue`: net revenue of a voucher date range (invoices minus credit notes) per currency, with tax
-  and gross; reads one voucher detail per voucher, at most 100 per call (larger ranges are rejected).
 - Setup without PHP: every release now contains a Claude Desktop extension (`.mcpb`) for macOS and
   Windows (one-click install, the API key is entered in Claude Desktop and stored securely), standalone
   binaries with PHP built in for macOS, Linux and Windows, a PHAR and `SHA256SUMS` (JAC-721).
@@ -75,11 +72,6 @@ First release.
 
 ### Added
 
-- Tool `revenue`: optional `groupBy=month` adds totals per calendar month; ranges with more than 100 detail
-  requests return `complete: false` and `coveredUntil` for a follow-up call instead of an error; voucher
-  details are cached in memory per server process (key id + `updatedDate`, 2000 entries).
-- Tool `revenue`: net revenue of a voucher date range (invoices minus credit notes) per currency, with tax
-  and gross; reads one voucher detail per voucher, at most 100 per call (larger ranges are rejected).
 - MCP server over stdio for Claude Desktop and other MCP clients, built on the official PHP MCP SDK (`mcp/sdk` 0.8).
 - Tool `open_items`: unpaid invoices (written in Lexware and booked sales vouchers), oldest due date
   first, with overdue flag, days overdue and totals per currency. Filters `overdueOnly` and `contact`.
@@ -90,7 +82,8 @@ First release.
 - API key only via the `LEXWARE_API_KEY` environment variable; setup with the macOS Keychain documented.
 - Architecture decision record, security policy, CI (PHP 8.4 and 8.5, PHPStan level 8, php-cs-fixer, jscpd).
 
-[Unreleased]: https://github.com/Stefan39/lexware-php-mcp/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/Stefan39/lexware-php-mcp/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/Stefan39/lexware-php-mcp/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Stefan39/lexware-php-mcp/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Stefan39/lexware-php-mcp/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Stefan39/lexware-php-mcp/releases/tag/v0.1.0

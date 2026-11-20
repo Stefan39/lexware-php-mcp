@@ -44,7 +44,7 @@ Laufzeitumgebung brauchen sollen, um einem KI-Assistenten Zugriff auf ihre Buchh
 
 ## Status
 
-v0.3.0, früh, aber nutzbar. Siehe das [Changelog](CHANGELOG.md) (englisch). Aktuell verfügbare Werkzeuge:
+v0.4.0, früh, aber nutzbar. Siehe das [Changelog](CHANGELOG.md) (englisch). Aktuell verfügbare Werkzeuge:
 
 | Werkzeug | Was es tut |
 |---|---|
@@ -139,7 +139,7 @@ Voraussetzungen:
 - Composer
 
 ```bash
-git clone --branch v0.3.0 https://github.com/Stefan39/lexware-php-mcp.git
+git clone --branch v0.4.0 https://github.com/Stefan39/lexware-php-mcp.git
 cd lexware-php-mcp
 composer install --no-dev
 ```
