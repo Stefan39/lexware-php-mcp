@@ -51,8 +51,8 @@ v0.3.0, early but usable. See the [changelog](CHANGELOG.md). Currently available
 | `search_vouchers` | Search vouchers by type, status, date range, contact and number, newest first. Optional parameters: `voucherType`, `voucherStatus`, `dateFrom`, `dateTo`, `voucherNumber`, `contact`, `limit` (default 50, max 250). Amounts are gross. |
 | `voucher_detail` | Line items and net, tax and gross amounts of one voucher. Required parameters: `id` (UUID), `voucherType` (as returned by `search_vouchers`; invoices, credit notes, down-payment invoices and bookkeeping vouchers). |
 | `search_contacts` | Search contacts by name, e-mail, number and role, sorted by name. At least one of `name`, `email` (both at least 3 characters), `number`, `role` (`customer` or `vendor`) is required; `limit` (default 50, max 250). Companies include e-mail addresses, phone numbers, billing address and contact person names; private persons are reduced to name, numbers and archived flag. |
+| `revenue` | Net revenue of a voucher date range (invoices minus credit notes, by voucher date), per currency, with tax and gross. Required parameters: `dateFrom`, `dateTo` (`YYYY-MM-DD`, inclusive, at most 366 days). Reads one voucher detail per voucher; at most 100 vouchers per call, larger ranges are rejected. Down-payment invoices, drafts and voided vouchers are not counted. |
 
-Planned: revenue per period.
 See [ADR 0001](docs/adr/0001-architecture.md).
 
 ## Safety

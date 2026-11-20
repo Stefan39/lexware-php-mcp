@@ -50,6 +50,10 @@
         {
             "name": "search_contacts",
             "description": "Search contacts by name, e-mail, number and role (customer or vendor)."
+        },
+        {
+            "name": "revenue",
+            "description": "Net revenue of a date range (invoices minus credit notes) per currency, at most 100 vouchers per call."
         }
     ],
     "user_config": {
