@@ -76,11 +76,11 @@ up to 3 attempts with exponential backoff (1 s, 2 s), respecting a numeric `Retr
 | `search_vouchers`: by type, status, date range, contact, number | `GET /v1/voucherlist` | **implemented** |
 | `voucher_detail`: line items, net/tax/gross | type-specific detail endpoints | **implemented** |
 | `search_contacts`: by name, email, number (no bank data) | `GET /v1/contacts` | **implemented**; private persons are reduced to id, type, name, numbers and archived flag (no e-mail, phone, address or note), so the model never sees their personal contact details |
-| `revenue`: net revenue per period (invoices minus credit notes) | voucher list + detail per voucher (N requests; throttled, cached per run) | planned |
+| `revenue`: net revenue per period (invoices minus credit notes) | voucher list + detail per voucher (N requests; throttled, cached per run) | **implemented** |
 
 `revenue` is the expensive one: net amounts need one detail request per voucher, i.e. about
 2 vouchers/second. A quarter with 150 invoices takes ~75 s. This needs progress notifications or a
-local cache; decided when the tool is built.
+local cache. At most 100 detail requests per call; larger ranges are rejected with a hint to shorten the range (resume and cache: #21).
 
 ### 6. Name: lexware-php-mcp
 

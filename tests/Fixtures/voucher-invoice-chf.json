@@ -1,0 +1,21 @@
+{
+  "id": "5b4a3c2d-1e0f-4b9a-8d7c-6e5f4a3b2c1d",
+  "voucherStatus": "paid",
+  "voucherNumber": "RE-2026-0070",
+  "voucherDate": "2026-09-28T00:00:00.000+02:00",
+  "address": {"name": "Swiss Kunde AG", "countryCode": "CH"},
+  "lineItems": [
+    {
+      "type": "custom",
+      "name": "Lizenz",
+      "quantity": 1,
+      "unitName": "Stück",
+      "unitPrice": {"currency": "CHF", "netAmount": 500.0, "grossAmount": 500.0, "taxRatePercentage": 0},
+      "discountPercentage": 0,
+      "lineItemAmount": 500.0
+    }
+  ],
+  "totalPrice": {"currency": "CHF", "totalNetAmount": 500.0, "totalGrossAmount": 500.0, "totalTaxAmount": 0.0},
+  "taxAmounts": [{"taxRatePercentage": 0, "taxAmount": 0.0, "netAmount": 500.0}],
+  "taxConditions": {"taxType": "net"}
+}

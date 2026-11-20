@@ -48,15 +48,17 @@ final readonly class VoucherDetail
     }
 
     /**
+     * @param bool $roundTotals false keeps the three voucher totals as sent, for callers that sum before rounding
+     *
      * @return Detail
      */
-    public function fetch(string $voucherType, string $id, string $path): array
+    public function fetch(string $voucherType, string $id, string $path, bool $roundTotals = true): array
     {
         $voucher = $this->filter->filter($this->client->getJson($path));
 
         return str_starts_with($path, self::BOOKKEEPING_PATH)
-            ? self::fromBookkeepingVoucher($voucher, $voucherType, $id)
-            : self::fromSalesVoucher($voucher, $voucherType, $id);
+            ? self::fromBookkeepingVoucher($voucher, $voucherType, $id, $roundTotals)
+            : self::fromSalesVoucher($voucher, $voucherType, $id, $roundTotals);
     }
 
     /**
@@ -66,7 +68,7 @@ final readonly class VoucherDetail
      *
      * @return Detail
      */
-    private static function fromSalesVoucher(array $voucher, string $voucherType, string $id): array
+    private static function fromSalesVoucher(array $voucher, string $voucherType, string $id, bool $roundTotals): array
     {
         $total = self::map($voucher, 'totalPrice');
         $gross = 'gross' === VoucherFields::string(self::map($voucher, 'taxConditions'), 'taxType');
@@ -92,9 +94,9 @@ final readonly class VoucherDetail
 
         return self::result($voucher, $voucherType, $id, VoucherFields::string(self::map($voucher, 'address'), 'name'), [
             'currency' => VoucherFields::string($total, 'currency', 'EUR'),
-            'totalNetAmount' => VoucherFields::amount($total, 'totalNetAmount'),
-            'totalTaxAmount' => VoucherFields::amount($total, 'totalTaxAmount'),
-            'totalGrossAmount' => VoucherFields::amount($total, 'totalGrossAmount'),
+            'totalNetAmount' => VoucherFields::amount($total, 'totalNetAmount', $roundTotals),
+            'totalTaxAmount' => VoucherFields::amount($total, 'totalTaxAmount', $roundTotals),
+            'totalGrossAmount' => VoucherFields::amount($total, 'totalGrossAmount', $roundTotals),
             'taxAmounts' => $taxAmounts,
             'lineItems' => $lineItems,
         ]);
@@ -107,7 +109,7 @@ final readonly class VoucherDetail
      *
      * @return Detail
      */
-    private static function fromBookkeepingVoucher(array $voucher, string $voucherType, string $id): array
+    private static function fromBookkeepingVoucher(array $voucher, string $voucherType, string $id, bool $roundTotals): array
     {
         $gross = 'gross' === VoucherFields::string($voucher, 'taxType');
 
@@ -126,12 +128,12 @@ final readonly class VoucherDetail
             $byRate[$key] = $entry;
         }
 
-        $totalGross = VoucherFields::amount($voucher, 'totalGrossAmount');
-        $totalTax = VoucherFields::amount($voucher, 'totalTaxAmount');
+        $totalGross = VoucherFields::amount($voucher, 'totalGrossAmount', $roundTotals);
+        $totalTax = VoucherFields::amount($voucher, 'totalTaxAmount', $roundTotals);
 
         return self::result($voucher, $voucherType, $id, VoucherFields::string($voucher, 'contactName'), [
             'currency' => VoucherFields::string($voucher, 'currency', 'EUR'),
-            'totalNetAmount' => round($totalGross - $totalTax, 2),
+            'totalNetAmount' => $roundTotals ? round($totalGross - $totalTax, 2) : $totalGross - $totalTax,
             'totalTaxAmount' => $totalTax,
             'totalGrossAmount' => $totalGross,
             'taxAmounts' => array_values($byRate),

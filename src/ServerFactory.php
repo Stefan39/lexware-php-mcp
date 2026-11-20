@@ -13,6 +13,7 @@ use Jacomeit\LexwarePhpMcp\Lexware\VoucherDetail;
 use Jacomeit\LexwarePhpMcp\Lexware\VoucherList;
 use Jacomeit\LexwarePhpMcp\Output\SensitiveDataFilter;
 use Jacomeit\LexwarePhpMcp\Tool\OpenItemsTool;
+use Jacomeit\LexwarePhpMcp\Tool\RevenueTool;
 use Jacomeit\LexwarePhpMcp\Tool\SearchContactsTool;
 use Jacomeit\LexwarePhpMcp\Tool\SearchVouchersTool;
 use Jacomeit\LexwarePhpMcp\Tool\VoucherDetailTool;
@@ -43,7 +44,9 @@ final class ServerFactory
         $openItems = new OpenItemsTool($vouchers, $clock);
         $searchVouchers = new SearchVouchersTool($vouchers);
         $searchContacts = new SearchContactsTool(new PagedList($client, new SensitiveDataFilter(), '/v1/contacts'));
-        $voucherDetail = new VoucherDetailTool(new VoucherDetail($client, new SensitiveDataFilter()));
+        $voucherDetails = new VoucherDetail($client, new SensitiveDataFilter());
+        $voucherDetail = new VoucherDetailTool($voucherDetails);
+        $revenue = new RevenueTool($vouchers, $voucherDetails);
 
         return Server::builder()
             ->setServerInfo(self::NAME, self::VERSION)
@@ -75,6 +78,13 @@ final class ServerFactory
                 name: SearchContactsTool::NAME,
                 title: 'Search contacts',
                 description: SearchContactsTool::DESCRIPTION,
+                annotations: new ToolAnnotations(readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true),
+            )
+            ->addTool(
+                [$revenue, '__invoke'],
+                name: RevenueTool::NAME,
+                title: 'Revenue (invoices minus credit notes)',
+                description: RevenueTool::DESCRIPTION,
                 annotations: new ToolAnnotations(readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true),
             )
             ->build();

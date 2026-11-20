@@ -16,6 +16,8 @@ contain breaking changes.
 
 ### Added
 
+- Tool `revenue`: net revenue of a voucher date range (invoices minus credit notes) per currency, with tax
+  and gross; reads one voucher detail per voucher, at most 100 per call (larger ranges are rejected).
 - Tool `search_contacts`: search contacts by name, e-mail, number and role (customer or vendor); private
   persons are reduced to name, numbers and archived flag, bank details and notes are never returned.
 - Tool `search_vouchers`: search the voucher list by type, status, date range, contact and voucher
@@ -32,6 +34,8 @@ contain breaking changes.
 
 ### Added
 
+- Tool `revenue`: net revenue of a voucher date range (invoices minus credit notes) per currency, with tax
+  and gross; reads one voucher detail per voucher, at most 100 per call (larger ranges are rejected).
 - Setup without PHP: every release now contains a Claude Desktop extension (`.mcpb`) for macOS and
   Windows (one-click install, the API key is entered in Claude Desktop and stored securely), standalone
   binaries with PHP built in for macOS, Linux and Windows, a PHAR and `SHA256SUMS` (JAC-721).
@@ -65,6 +69,8 @@ First release.
 
 ### Added
 
+- Tool `revenue`: net revenue of a voucher date range (invoices minus credit notes) per currency, with tax
+  and gross; reads one voucher detail per voucher, at most 100 per call (larger ranges are rejected).
 - MCP server over stdio for Claude Desktop and other MCP clients, built on the official PHP MCP SDK (`mcp/sdk` 0.8).
 - Tool `open_items`: unpaid invoices (written in Lexware and booked sales vouchers), oldest due date
   first, with overdue flag, days overdue and totals per currency. Filters `overdueOnly` and `contact`.

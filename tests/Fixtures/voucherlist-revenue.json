@@ -1,0 +1,16 @@
+{
+  "content": [
+    {"id": "e9066f04-8cc7-4616-93f8-3d24f2a43d3a", "voucherType": "invoice", "voucherStatus": "open", "voucherNumber": "RE-2026-0060", "voucherDate": "2026-09-01T00:00:00.000+02:00", "contactName": "Beispiel AG", "totalAmount": 1232.80, "openAmount": 1232.80, "currency": "EUR"},
+    {"id": "4f1e8a7c-92d3-4b05-a6c8-1d3e5f7a9b02", "voucherType": "salesinvoice", "voucherStatus": "paid", "voucherNumber": "RE-4711", "voucherDate": "2026-09-02T00:00:00.000+02:00", "contactName": "Muster Bau GmbH", "totalAmount": 226.00, "openAmount": 0.00, "currency": "EUR"},
+    {"id": "c2a5d0f1-3b7e-4c1a-9d2e-6f8a1b4c7d90", "voucherType": "creditnote", "voucherStatus": "paid", "voucherNumber": "GS-2026-0003", "voucherDate": "2026-09-20T00:00:00.000+02:00", "contactName": "Beispiel AG", "totalAmount": 178.50, "openAmount": 0.00, "currency": "EUR"},
+    {"id": "7a6b5c4d-3e2f-4a1b-8c9d-0e1f2a3b4c5d", "voucherType": "salescreditnote", "voucherStatus": "paid", "voucherNumber": "GS-9001", "voucherDate": "2026-09-25T00:00:00.000+02:00", "contactName": "Muster Bau GmbH", "totalAmount": 119.00, "openAmount": 0.00, "currency": "EUR"},
+    {"id": "5b4a3c2d-1e0f-4b9a-8d7c-6e5f4a3b2c1d", "voucherType": "invoice", "voucherStatus": "paid", "voucherNumber": "RE-2026-0070", "voucherDate": "2026-09-28T00:00:00.000+02:00", "contactName": "Swiss Kunde AG", "totalAmount": 500.00, "openAmount": 0.00, "currency": "CHF"}
+  ],
+  "first": true,
+  "last": true,
+  "totalPages": 1,
+  "totalElements": 5,
+  "numberOfElements": 5,
+  "size": 250,
+  "number": 0
+}
