@@ -2,7 +2,7 @@
     "manifest_version": "0.3",
     "name": "lexware-php-mcp",
     "display_name": "lexware-php-mcp (unofficial)",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "description": "Unofficial, read-only access to your Lexware Office (formerly lexoffice) account. Not affiliated with Haufe Group.",
     "long_description": "Ask Claude things like \"Which invoices are overdue?\" and get answers straight from your Lexware Office account. The server only reads data, never changes it, and strips bank details from every response. Unofficial, not affiliated with Haufe Group. Lexware and lexoffice are trademarks of Haufe Group.",
     "author": {
