@@ -80,7 +80,7 @@ up to 3 attempts with exponential backoff (1 s, 2 s), respecting a numeric `Retr
 
 `revenue` is the expensive one: net amounts need one detail request per voucher, i.e. about
 2 vouchers/second. A quarter with 150 invoices takes ~75 s. This needs progress notifications or a
-local cache. At most 100 detail requests per call; larger ranges are rejected with a hint to shorten the range (resume and cache: #21).
+local cache. At most 100 detail requests per call; larger ranges return `complete: false` with `coveredUntil` for a follow-up call. Details are cached in memory per server process (key id + updatedDate, 2000 entries). No progress notifications.
 
 ### 6. Name: lexware-php-mcp
 

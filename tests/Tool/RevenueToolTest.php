@@ -7,6 +7,7 @@ namespace Jacomeit\LexwarePhpMcp\Tests\Tool;
 use Jacomeit\LexwarePhpMcp\Lexware\LexwareClient;
 use Jacomeit\LexwarePhpMcp\Lexware\RequestThrottle;
 use Jacomeit\LexwarePhpMcp\Lexware\VoucherDetail;
+use Jacomeit\LexwarePhpMcp\Lexware\VoucherDetailCache;
 use Jacomeit\LexwarePhpMcp\Lexware\VoucherList;
 use Jacomeit\LexwarePhpMcp\Output\SensitiveDataFilter;
 use Jacomeit\LexwarePhpMcp\Tool\RevenueTool;
@@ -149,30 +150,220 @@ final class RevenueToolTest extends TestCase
         }
     }
 
-    public function testRejectsTooManyVouchersWithoutDetailRequests(): void
+    public function testStopsAtDayBoundaryWhenCapIsReached(): void
     {
-        $tool = $this->createTool([$this->fixture('voucherlist-revenue')], maxDetailRequests: 4);
+        $tool = $this->createTool($this->revenueResponses(), maxDetailRequests: 4);
+
+        $result = $tool('2026-09-01', '2026-09-30');
+
+        self::assertFalse($result['complete']);
+        self::assertSame('2026-09-25', $result['coveredUntil']);
+        self::assertSame('EUR', $result['totals'][0]['currency']);
+        self::assertSame(2, $result['totals'][0]['invoiceCount']);
+        self::assertSame(2, $result['totals'][0]['creditNoteCount']);
+        self::assertStringContainsString('day after coveredUntil', $result['note']);
+    }
+
+    public function testCoveredUntilIsDateToWhenEverythingWasRead(): void
+    {
+        $result = $this->createTool($this->revenueResponses())('2026-09-01', '2026-09-30');
+
+        self::assertSame('2026-09-30', $result['coveredUntil']);
+    }
+
+    public function testFollowUpFromDayAfterCoveredUntilContinuesWithoutGaps(): void
+    {
+        $days = ['2026-09-01', '2026-09-01', '2026-09-02', '2026-09-02', '2026-09-03'];
+        $tool = $this->createTool([
+            $this->listOf($this->vouchersOn($days)),
+            ...array_map(fn(): MockResponse => $this->smallInvoice(10.0), \array_slice($days, 0, 4)),
+            $this->listOf(array_slice($this->vouchersOn($days), 4)),
+            $this->smallInvoice(10.0),
+        ], maxDetailRequests: 4);
+
+        $first = $tool('2026-09-01', '2026-09-30');
+        $second = $tool('2026-09-03', '2026-09-30');
+
+        self::assertFalse($first['complete']);
+        self::assertSame('2026-09-02', $first['coveredUntil']);
+        self::assertSame(40.0, $first['totals'][0]['netRevenue']);
+        self::assertTrue($second['complete']);
+        self::assertSame(10.0, $second['totals'][0]['netRevenue']);
+        self::assertSame('2026-09-03', $this->queryValue(5, 'voucherDateFrom'));
+    }
+
+    public function testProcessesVouchersOldestFirstByDateThenNumber(): void
+    {
+        $vouchers = $this->vouchersOn(['2026-09-02', '2026-09-01', '2026-09-01']);
+        $vouchers[1] = ['voucherNumber' => 'RE-B'] + $vouchers[1];
+        $vouchers[2] = ['voucherNumber' => 'RE-A'] + $vouchers[2];
+
+        $this->createTool([$this->listOf($vouchers), ...$this->smallInvoices(3)])('2026-09-01', '2026-09-30');
+
+        $ids = array_map(static fn(MockResponse $response): string => basename((string) parse_url($response->getRequestUrl(), PHP_URL_PATH)), \array_slice($this->responses, 1));
+        self::assertSame([$vouchers[2]['id'], $vouchers[1]['id'], $vouchers[0]['id']], $ids);
+    }
+
+    public function testFirstDayAboveCapIsToolError(): void
+    {
+        $tool = $this->createTool([$this->listOf($this->vouchersOn(['2026-09-01', '2026-09-01', '2026-09-01']))], maxDetailRequests: 2);
 
         try {
             $tool('2026-09-01', '2026-09-30');
             self::fail('Expected ToolCallException');
         } catch (ToolCallException $exception) {
-            self::assertSame('5 vouchers in this range; at most 4 per call. Use a shorter date range.', $exception->getMessage());
+            self::assertSame('3 vouchers on 2026-09-01; at most 2 per call.', $exception->getMessage());
             self::assertCount(1, $this->responses);
         }
     }
 
-    public function testMarksResultIncompleteWhenPageCapIsHit(): void
+    public function testCoveredUntilIsLastCompleteDayWhenPageCapIsHit(): void
     {
         $result = $this->createTool([
             $this->fixture('voucherlist-page-0'),
             $this->fixture('voucher-invoice'),
-            $this->fixture('voucher-bookkeeping'),
         ], maxPages: 1)('2026-08-01', '2026-09-30');
 
         self::assertFalse($result['complete']);
-        self::assertSame(1230.0, $result['totals'][0]['netRevenue']);
+        self::assertSame('2026-08-01', $result['coveredUntil']);
+        self::assertSame(1040.0, $result['totals'][0]['netRevenue']);
         self::assertStringContainsString('complete is false', $result['note']);
+        self::assertSame('voucherDate,ASC', $this->queryValue(0, 'sort'));
+    }
+
+    public function testSingleDayOnPageCapIsToolError(): void
+    {
+        $this->expectException(ToolCallException::class);
+        $this->expectExceptionMessage('More vouchers on 2026-09-01');
+
+        $list = new MockResponse(json_encode(['content' => $this->vouchersOn(['2026-09-01']), 'first' => true, 'last' => false, 'number' => 0], \JSON_THROW_ON_ERROR));
+        $this->createTool([$list], maxPages: 1)('2026-09-01', '2026-09-30');
+    }
+
+    public function testGroupsByMonth(): void
+    {
+        $days = ['2026-08-31', '2026-09-01', '2026-09-02'];
+        $result = $this->createTool([$this->listOf($this->vouchersOn($days)), ...$this->smallInvoices(3)])('2026-08-01', '2026-09-30', 'month');
+
+        self::assertSame(30.0, $result['totals'][0]['netRevenue']);
+        self::assertSame(['2026-08', '2026-09'], array_column($result['periods'] ?? [], 'period'));
+        self::assertSame(10.0, $result['periods'][0]['totals'][0]['netRevenue'] ?? null);
+        self::assertSame(20.0, $result['periods'][1]['totals'][0]['netRevenue'] ?? null);
+        self::assertSame(2, $result['periods'][1]['totals'][0]['invoiceCount']);
+    }
+
+    public function testNoPeriodsWithoutGrouping(): void
+    {
+        $result = $this->createTool([$this->emptyList()])('2026-09-01', '2026-09-30', 'none');
+
+        self::assertArrayNotHasKey('periods', $result);
+    }
+
+    public function testRejectsInvalidGroupByBeforeAnyRequest(): void
+    {
+        $tool = $this->createTool([]);
+
+        try {
+            $tool('2026-09-01', '2026-09-30', 'week');
+            self::fail('Expected ToolCallException');
+        } catch (ToolCallException) {
+            self::assertCount(0, $this->responses);
+        }
+    }
+
+    public function testCacheHitSkipsSecondDetailRequest(): void
+    {
+        $vouchers = $this->vouchersOn(['2026-09-01']);
+        $tool = $this->createTool([$this->listOf($vouchers), $this->smallInvoice(10.0), $this->listOf($vouchers)]);
+
+        $first = $tool('2026-09-01', '2026-09-30');
+        $second = $tool('2026-09-01', '2026-09-30');
+
+        self::assertSame($first['totals'], $second['totals']);
+        self::assertCount(3, $this->responses);
+        self::assertSame('/v1/voucherlist', parse_url($this->responses[2]->getRequestUrl(), PHP_URL_PATH));
+    }
+
+    public function testCacheMissAfterChangedUpdatedDate(): void
+    {
+        $vouchers = $this->vouchersOn(['2026-09-01']);
+        $changed = [['updatedDate' => '2026-09-05T10:00:00.000+02:00'] + $vouchers[0]];
+        $tool = $this->createTool([$this->listOf($vouchers), $this->smallInvoice(10.0), $this->listOf($changed), $this->smallInvoice(12.0)]);
+
+        $tool('2026-09-01', '2026-09-30');
+        $result = $tool('2026-09-01', '2026-09-30');
+
+        self::assertSame(12.0, $result['totals'][0]['netRevenue']);
+    }
+
+    public function testCacheEvictsOldestEntryAtBound(): void
+    {
+        $vouchers = $this->vouchersOn(['2026-09-01', '2026-09-02']);
+        $tool = $this->createTool([
+            $this->listOf($vouchers),
+            ...$this->smallInvoices(2),
+            $this->listOf([$vouchers[1]]),
+            $this->listOf([$vouchers[0]]),
+            $this->smallInvoice(10.0),
+        ], cache: new VoucherDetailCache(1));
+
+        $tool('2026-09-01', '2026-09-30');
+        $tool('2026-09-02', '2026-09-30');
+        $tool('2026-09-01', '2026-09-01');
+
+        // The second voucher is still cached (no request); the first one was evicted and is read again.
+        self::assertSame('/v1/invoices/' . $vouchers[0]['id'], parse_url($this->responses[5]->getRequestUrl(), PHP_URL_PATH));
+    }
+
+    public function testCachedVouchersDoNotCountAgainstCap(): void
+    {
+        $days = ['2026-09-01', '2026-09-02', '2026-09-03'];
+        $vouchers = $this->vouchersOn($days);
+        $tool = $this->createTool([
+            $this->listOf(\array_slice($vouchers, 0, 2)),
+            ...$this->smallInvoices(2),
+            $this->listOf($vouchers),
+            $this->smallInvoice(10.0),
+        ], maxDetailRequests: 2);
+
+        $tool('2026-09-01', '2026-09-02');
+        $result = $tool('2026-09-01', '2026-09-30');
+
+        self::assertTrue($result['complete']);
+        self::assertSame(30.0, $result['totals'][0]['netRevenue']);
+    }
+
+    public function testEvictionWhileReadingADayDoesNotExceedCap(): void
+    {
+        $vouchers = $this->vouchersOn(['2026-09-01', '2026-09-01']);
+        $tool = $this->createTool([
+            $this->listOf([$vouchers[1]]),
+            $this->smallInvoice(10.0),
+            $this->listOf($vouchers),
+            $this->smallInvoice(10.0),
+        ], maxDetailRequests: 1, cache: new VoucherDetailCache(1));
+
+        $tool('2026-09-01', '2026-09-30');
+        $result = $tool('2026-09-01', '2026-09-30');
+
+        self::assertCount(4, $this->responses);
+        self::assertTrue($result['complete']);
+        self::assertSame(20.0, $result['totals'][0]['netRevenue']);
+    }
+
+    public function testMonthGroupingWithoutCountedVouchersHasEmptyPeriods(): void
+    {
+        $result = $this->createTool([$this->emptyList()])('2026-09-01', '2026-09-30', 'month');
+
+        self::assertSame([], $result['periods'] ?? null);
+    }
+
+    public function testListPageCapWithoutUsableVouchersIsToolError(): void
+    {
+        $list = new MockResponse(json_encode(['content' => [], 'first' => true, 'last' => false, 'number' => 0], \JSON_THROW_ON_ERROR));
+
+        $this->expectException(ToolCallException::class);
+        $this->createTool([$list], maxPages: 1)('2026-09-01', '2026-09-30');
     }
 
     public function testLexwareErrorFromListBecomesToolError(): void
@@ -213,14 +404,14 @@ final class RevenueToolTest extends TestCase
     /**
      * @param list<MockResponse> $responses
      */
-    private function createTool(array $responses, int $maxPages = 10, int $maxDetailRequests = 100): RevenueTool
+    private function createTool(array $responses, int $maxPages = 10, int $maxDetailRequests = 100, ?VoucherDetailCache $cache = null): RevenueTool
     {
         $this->responses = $responses;
         $clock = new MockClock('2026-10-10 09:00:00', 'Europe/Berlin');
         $client = new LexwareClient(new MockHttpClient($responses, 'https://api.example.test'), new RequestThrottle($clock), $clock);
         $filter = new SensitiveDataFilter();
 
-        return new RevenueTool(new VoucherList($client, $filter), new VoucherDetail($client, $filter), $maxPages, $maxDetailRequests);
+        return new RevenueTool(new VoucherList($client, $filter), new VoucherDetail($client, $filter), $cache ?? new VoucherDetailCache(), $maxPages, $maxDetailRequests);
     }
 
     private function fixture(string $name): MockResponse
@@ -234,13 +425,43 @@ final class RevenueToolTest extends TestCase
     }
 
     /**
-     * @param list<array{id: string, voucherType: string}> $vouchers
+     * @param list<array<string, string>> $vouchers
      */
     private function listOf(array $vouchers): MockResponse
     {
         return new MockResponse(json_encode(['content' => $vouchers, 'first' => true, 'last' => true, 'number' => 0], \JSON_THROW_ON_ERROR));
     }
 
+    /**
+     * Synthetic invoices, one per given voucher date, with ids in list order.
+     *
+     * @param list<string> $days
+     *
+     * @return list<array{id: string, voucherType: string, voucherNumber: string, voucherDate: string, updatedDate: string}>
+     */
+    private function vouchersOn(array $days): array
+    {
+        $vouchers = [];
+        foreach ($days as $index => $day) {
+            $vouchers[] = [
+                'id' => \sprintf('00000000-0000-4000-8000-%012d', $index + 1),
+                'voucherType' => 'invoice',
+                'voucherNumber' => \sprintf('RE-%04d', $index + 1),
+                'voucherDate' => $day . 'T00:00:00.000+02:00',
+                'updatedDate' => $day . 'T10:00:00.000+02:00',
+            ];
+        }
+
+        return $vouchers;
+    }
+
+    /**
+     * @return list<MockResponse>
+     */
+    private function smallInvoices(int $count): array
+    {
+        return array_map(fn(): MockResponse => $this->smallInvoice(10.0), range(1, $count));
+    }
     private function smallInvoice(float $net): MockResponse
     {
         return new MockResponse(json_encode([
